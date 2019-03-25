@@ -89,7 +89,7 @@ public class TestMetier {
 				siteDeParisMetier.validitePasswordGestionnaire(null);
 				System.out.println("validitePasswordGestionnaire avec un password gestionnaire invalide (non instancié) n'a pas levé l'exception MetierException");
 			}
-			catch (MetierException e) { }
+			catch (MetierException e) { System.out.println(e.getMessage()); }
 			catch (Exception e) { 
 				System.out.println("validitePasswordGestionnaire avec un password gestionnaire invalide (non instancié)  n'a pas levé l'exception MetierException mais " + e.getClass().getName());
 			}

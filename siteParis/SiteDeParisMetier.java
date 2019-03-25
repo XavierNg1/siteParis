@@ -53,9 +53,30 @@ public class SiteDeParisMetier {
 	 * @throws MetierException  levée 
 	 * si le <code>passwordGestionnaire</code>  est invalide 
 	 */
+    
+   private String passwordGestionnaire;
+    
 	public SiteDeParisMetier(String passwordGestionnaire) throws MetierException {
-
-	}
+   
+      if (passwordGestionnaire == null)
+         throw new MetierException("Le mot de passe doit etre instancie !");
+      
+      if (passwordGestionnaire.length() < 8)
+         throw new MetierException(passwordGestionnaire);
+           
+      for (int i = 0; i < passwordGestionnaire.length(); i++){
+         char c = passwordGestionnaire.charAt(i);
+         if (c == ' ')
+            throw new MetierException(passwordGestionnaire);
+         if (c == '-')
+            throw new MetierException(passwordGestionnaire); 
+      
+      this.passwordGestionnaire = passwordGestionnaire;      
+         
+      }
+        
+  
+     }
 
 
 
@@ -81,6 +102,8 @@ public class SiteDeParisMetier {
 	 * 
 	 * @return le mot de passe (déterminé par le site) du nouveau joueur inscrit.
 	 */
+
+
 	public String inscrireJoueur(String nom, String prenom, String pseudo, String passwordGestionnaire) throws MetierException, JoueurExistantException, JoueurException {
 		return "unPasswordUnique";
 	}
@@ -357,7 +380,6 @@ public class SiteDeParisMetier {
 	/**
 	 * @uml.property  name="passwordGestionnaire"
 	 */
-	private String passwordGestionnaire;
 
 	/**
 	 * Getter of the property <tt>passwordGestionnaire</tt>
