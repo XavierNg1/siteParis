@@ -346,6 +346,10 @@ public class SiteDeParisMetier {
 	protected void validitePasswordGestionnaire(String passwordGestionnaire) throws MetierException {
 	    if (passwordGestionnaire==null) throw new MetierException();
 	    if (!passwordGestionnaire.matches("[0-9A-Za-z]{8,}")) throw new MetierException();
+       else {
+         if (!(this.passwordGestionnaire == passwordGestionnaire))
+            throw new MetierException("Password invalide");
+       };
 	}
 
 	/** 

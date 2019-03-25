@@ -25,7 +25,7 @@ public class TestMetier {
 			siteDeParisMetier = new SiteDeParisMetier(null);
 			System.out.println("construire un site de paris avec un password gestionnaire invalide (non instancié) n'a pas levé l'exception MetierException");
 		}
-		catch (MetierException e) { }
+		catch (MetierException e) { System.out.println(e.getMessage());}
 		catch (Exception e) { 
 			System.out.println("construire un site de paris avec un password gestionnaire invalide (non instancié) n'a pas levé l'exception MetierException mais " + e.getClass().getName());
 		}
@@ -89,7 +89,7 @@ public class TestMetier {
 				siteDeParisMetier.validitePasswordGestionnaire(null);
 				System.out.println("validitePasswordGestionnaire avec un password gestionnaire invalide (non instancié) n'a pas levé l'exception MetierException");
 			}
-			catch (MetierException e) { System.out.println(e.getMessage()); }
+			catch (MetierException e) { }
 			catch (Exception e) { 
 				System.out.println("validitePasswordGestionnaire avec un password gestionnaire invalide (non instancié)  n'a pas levé l'exception MetierException mais " + e.getClass().getName());
 			}
@@ -116,7 +116,7 @@ public class TestMetier {
 				siteDeParisMetier.validitePasswordGestionnaire("qsdf-523e");
 				System.out.println("validitePasswordGestionnaire avec un password gestionnaire invalide (un -) n'a pas levé l'exception MetierException ");
 			}
-			catch (MetierException e) { }
+			catch (MetierException e) { System.out.println(e.getMessage()); }
 			catch (Exception e) { 
 				System.out.println("validitePasswordGestionnaire avec validitePasswordGestionnaire avec un password gestionnaire invalide (un -)  n'a pas levé l'exception MetierException mais " + e.getClass().getName());
 			}
@@ -1132,7 +1132,7 @@ public class TestMetier {
 	public static void main (String [] args) {
 
 		testConstructeurSiteDeParisMetier();
-//		testValiditePasswordGestionnaire();
+      testValiditePasswordGestionnaire();
 //		testInscrireDesinscrireJoueur();
 //		testCrediterDebiterJoueur();
 //		testAjouterCompetition();
