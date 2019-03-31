@@ -320,11 +320,11 @@ public class TestMetier {
 				System.out.println("désinscrire un joueur déjà retiré n'a pas levé l'exception JoueurInexistantException mais " + e.getClass().getName());
 			}
 
-		}
-		catch (Exception e) {
-			System.out.println("\n Exception imprévue : " + e);
-			e.printStackTrace();
-		}
+			}
+			catch (Exception e) {
+				System.out.println("\n Exception imprévue : " + e);
+				e.printStackTrace();
+			}
 
 
 	}		
@@ -1132,15 +1132,15 @@ public class TestMetier {
 	public static void main (String [] args) {
 
 		testConstructeurSiteDeParisMetier();
-      testValiditePasswordGestionnaire();
-//		testInscrireDesinscrireJoueur();
-//		testCrediterDebiterJoueur();
-//		testAjouterCompetition();
+      	testValiditePasswordGestionnaire();
+      	testInscrireDesinscrireJoueur();
+   	testCrediterDebiterJoueur();
+		testAjouterCompetition();
 //		testMiserVainqueur();
 //		testSolderVainqueur();
 //		testConsulterCompetitions();
-//		testConsulterCompetiteurs();
-//		testConsulterJoueurs();		
+//    testConsulterCompetiteurs();
+      //testConsulterJoueurs();		
 
 	}
 

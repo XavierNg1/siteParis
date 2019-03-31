@@ -32,6 +32,7 @@ public class Competiteur {
 		/**
 		 */
 		public Competiteur(String nom){
+			
 		}
 
 			
@@ -41,35 +42,6 @@ public class Competiteur {
 				return false;	
 			}
 
-
-			/** 
-			 * @uml.property name="competition"
-			 * @uml.associationEnd multiplicity="(1 1)" inverse="competiteur:siteParis.Competition"
-			 * @uml.association name="vainqueur"
-			 */
-			private Competition competition1 = new siteParis.Competition();
-
-			/**
-			 * Getter of the property <tt>competition</tt>
-			 * @return  Returns the competition1.
-			 * @uml.property  name="competition"
-			 */
-			public Competition getCompetition() {
-				return competition1;
-			}
-
-			/**
-			 * Setter of the property <tt>competition</tt>
-			 * @param competition  The competition1 to set.
-			 * @uml.property  name="competition"
-			 */
-			public void setCompetition(Competition competition) {
-				competition1 = competition;
-			}
-
-				
-				/**
-				 */
 				public Competiteur(){
 				}
 

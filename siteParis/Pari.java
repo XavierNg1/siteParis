@@ -8,30 +8,10 @@ public class Pari {
 	/**
 	 * @uml.property  name="type"
 	 */
-	private String type;
-
-	/**
-	 * Getter of the property <tt>type</tt>
-	 * @return  Returns the type.
-	 * @uml.property  name="type"
-	 */
-	public String getType() {
-		return type;
-	}
-
-	/**
-	 * Setter of the property <tt>type</tt>
-	 * @param type  The type to set.
-	 * @uml.property  name="type"
-	 */
-	public void setType(String type) {
-		this.type = type;
-	}
-
-	/** 
-	 * @uml.property name="montant"
-	 */
 	private int montant;
+	private Joueur parieur;
+	private Competiteur vainqueurEspere;
+	private Competition competition;
 
 	/** 
 	 * Getter of the property <tt>montant</tt>
@@ -42,99 +22,64 @@ public class Pari {
 		return montant;
 	}
 
+	public void setMontant(int montant) {
+		this.montant = montant;
+	}
+
+	public Joueur getParieur() {
+		return parieur;
+	}
+
+	public void setParieur(Joueur parieur) {
+		this.parieur = parieur;
+	}
+
+	public Competiteur getVainqueurEspere() {
+		return vainqueurEspere;
+	}
+
+	public void setVainqueurEspere(Competiteur vainqueur) {
+		this.vainqueurEspere = vainqueur;
+	}
+
+	public Competition getCompetition() {
+		return competition;
+	}
+
+	public void setCompetition(Competition competition) {
+		this.competition = competition;
+	}
+
 	/**
-		 */
-		public Pari(String type, int montant){
+	 * Constructeur de la classe
+	 */
+	public Pari(Joueur parieur, int montant, Competiteur vainqueurEspere, Competition competition) {
+		this.parieur = parieur;
+		this.montant = montant;
+		this.vainqueurEspere = vainqueurEspere;
+		this.competition = competition;
+	}
+
+	/**
+	 * Methode equals de la classe Pari
+	 * @return Retourne un boolean pour nous dire si deux paris sont egaux
+	 */
+	public boolean equals(Pari pari){
+		if (this.parieur == pari.getParieur()) {
+			if (this.montant == pari.getMontant()) {
+				if (this.competition == pari.getCompetition()) {
+					if (this.vainqueurEspere == pari.getVainqueurEspere())
+						return true;
+					return false;
+				}
+				return false;
+			}
+			return false;
 		}
+		return false;	
+	}
 
-		/** 
-		 * Setter of the property <tt>montant</tt>
-		 * @param montant  The montant to set.
-		 * @uml.property  name="montant"
-		 */
-		public void setMontant(int montant) {
-			this.montant = montant;
-		}
+	public Pari() {
 
-			
-			/**
-			 */
-			public boolean equals(Pari pari){
-				return false;	
-			}
-
-			/** 
-			 * @uml.property name="joueurs"
-			 * @uml.associationEnd multiplicity="(0 -1)" inverse="paris:siteParis.Joueur"
-			 * @uml.association name="listeParis"
-			 */
-			private Collection joueurs = new java.util.ArrayList();
-
-			/** 
-			 * Getter of the property <tt>joueurs</tt>
-			 * @return  Returns the joueurs.
-			 * @uml.property  name="joueurs"
-			 */
-			public Collection getJoueurs() {
-				return joueurs;
-			}
-
-			/** 
-			 * Setter of the property <tt>joueurs</tt>
-			 * @param joueurs  The joueurs to set.
-			 * @uml.property  name="joueurs"
-			 */
-			public void setJoueurs(Collection joueurs) {
-				this.joueurs = joueurs;
-			}
-
-			/**
-			 * @uml.property  name="competiteur"
-			 * @uml.associationEnd  multiplicity="(1 1)" inverse="pari:siteParis.Competiteur"
-			 * @uml.association  name="vainqueurEspere"
-			 */
-			private Competiteur competiteur = new siteParis.Competiteur();
-
-			/**
-			 * Getter of the property <tt>competiteur</tt>
-			 * @return  Returns the competiteur.
-			 * @uml.property  name="competiteur"
-			 */
-			public Competiteur getCompetiteur() {
-				return competiteur;
-			}
-
-			/**
-			 * Setter of the property <tt>competiteur</tt>
-			 * @param competiteur  The competiteur to set.
-			 * @uml.property  name="competiteur"
-			 */
-			public void setCompetiteur(Competiteur competiteur) {
-				this.competiteur = competiteur;
-			}
-
-			/**
-			 * @uml.property  name="competition"
-			 * @uml.associationEnd  inverse="pari:siteParis.Competition"
-			 */
-			private Competition competition;
-
-			/**
-			 * Getter of the property <tt>competition</tt>
-			 * @return  Returns the competition.
-			 * @uml.property  name="competition"
-			 */
-			public Competition getCompetition() {
-				return competition;
-			}
-
-			/**
-			 * Setter of the property <tt>competition</tt>
-			 * @param competition  The competition to set.
-			 * @uml.property  name="competition"
-			 */
-			public void setCompetition(Competition competition) {
-				this.competition = competition;
-			}
-
+	}
 }

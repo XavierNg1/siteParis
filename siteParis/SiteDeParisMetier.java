@@ -3,6 +3,8 @@ package siteParis;
 
 import java.util.LinkedList;
 import java.util.Collection;
+import java.util.Map;
+import java.util.HashMap;
 
 
 /**
@@ -54,29 +56,20 @@ public class SiteDeParisMetier {
 	 * si le <code>passwordGestionnaire</code>  est invalide 
 	 */
     
-   private String passwordGestionnaire;
+	private String passwordGestionnaire;
+	private LinkedList<Joueur> listeJoueurs;
+	private LinkedList<Competition> listeCompetitions;
     
 	public SiteDeParisMetier(String passwordGestionnaire) throws MetierException {
-   
-      if (passwordGestionnaire == null)
-         throw new MetierException("Le mot de passe doit etre instancie !");
-      
-      if (passwordGestionnaire.length() < 8)
-         throw new MetierException(passwordGestionnaire);
-           
-      for (int i = 0; i < passwordGestionnaire.length(); i++){
-         char c = passwordGestionnaire.charAt(i);
-         if (c == ' ')
-            throw new MetierException(passwordGestionnaire);
-         if (c == '-')
-            throw new MetierException(passwordGestionnaire); 
-      
-      this.passwordGestionnaire = passwordGestionnaire;      
-         
-      }
-        
-  
-     }
+
+		if (passwordGestionnaire == null)
+			throw new MetierException("Le mot de passe doit etre instancie !");
+		/** Verifie si le pswd fait bien au moins 8 caracteres alphanumeriques */
+		if (!passwordGestionnaire.matches("[0-9A-Za-z]{8,}")) throw new MetierException();
+      this.passwordGestionnaire = passwordGestionnaire; 
+      this.listeJoueurs = new LinkedList<Joueur>();
+      this.listeCompetitions = new LinkedList<Competition>();      
+  }
 
 
 
@@ -105,7 +98,48 @@ public class SiteDeParisMetier {
 
 
 	public String inscrireJoueur(String nom, String prenom, String pseudo, String passwordGestionnaire) throws MetierException, JoueurExistantException, JoueurException {
-		return "unPasswordUnique";
+		
+		/** On teste si les arguments en parametres ne sont pas null */
+		if (pseudo == null) throw new JoueurException ("Le pseudo doit etre instancie");
+		if (nom == null) throw new JoueurException("Le nom doit etre instancie !");
+		if (prenom == null) throw new JoueurException("Le prenom doit etre instancie !");
+		if (passwordGestionnaire == null) throw new MetierException("Veuillez entrer le mot de passe du gestionnaire");
+
+		/** On teste si c'est bien le mot de passe du gestionnaire.  */
+		this.validitePasswordGestionnaire(passwordGestionnaire);
+		
+		/** On teste si les pseudo, nom et prenom ont le bon format. */
+		if (!pseudo.matches("[0-9A-Za-z]{4,}")) throw new JoueurException("Un pseudo doit contenir au moins 4 caracteres et ils doivent etre alphanumeriques");
+		if (!nom.matches("[0-9A-Za-z]{1,}")) throw new JoueurException("Le nom doit contenir au moins 1 caractere et doit etre alphanumeriques");
+		if (!prenom.matches("[0-9A-Za-z]{1,}")) throw new JoueurException("Le prenom doit contenir au moins 1 caractere et doit etre alphanumeriques");
+
+		/** On teste si le joueur existe deja. */
+		if (listeJoueurs.size()!=0) {
+			for(Joueur joueur : listeJoueurs) {
+				if(joueur.getPseudo().equals(pseudo)) throw new JoueurExistantException("Ce pseudo existe deja");
+         }
+			}
+      if (listeJoueurs.size()!=0) {
+			for(Joueur joueur : listeJoueurs) {
+				if((joueur.getNom().equals(nom)) && (joueur.getPrenom().equals(prenom))) throw new JoueurExistantException("Le nom et le prenom exist deja");
+			}
+		}
+		/** On inscrit le joueur si tous les tests ont ete passe. */
+
+		/** Generation du mot de passe */
+		int length=8;
+		String chars = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ1234567890"+pseudo; // Tu supprimes les lettres dont tu ne veux pas
+		String password = "";
+		for(int x=0;x<length;x++) {
+			int y = (int)Math.floor(Math.random() * (62+ pseudo.length())); // Si tu supprimes des lettres tu diminues ce nb
+			password += chars.charAt(y);
+		}
+
+		Joueur joueur = new Joueur(nom, prenom, pseudo, 0, password);
+
+		/** On ajoute le joueur a la lsite des joueurs du site */
+		listeJoueurs.add(joueur);
+		return password;
 	}
 
 	/**
@@ -128,7 +162,38 @@ public class SiteDeParisMetier {
 	 * 
 	 */
 	public long desinscrireJoueur(String nom, String prenom, String pseudo, String passwordGestionnaire) throws MetierException, JoueurInexistantException, JoueurException {
-		return 0;
+
+		/** On teste si les arguments en parametres ne sont pas null. */
+		if (pseudo == null) throw new JoueurException ("Le pseudo doit etre instancie");
+		if (nom == null) throw new JoueurException("Le nom doit etre instancie !");
+		if (prenom == null) throw new JoueurException("Le prenom doit etre instancie !");
+		if (passwordGestionnaire == null) throw new MetierException("Veuillez entrer le mot de passe du gestionnaire");
+
+		/** On teste si c'est bien le mot de passe du gestionnaire.  */
+		this.validitePasswordGestionnaire(passwordGestionnaire);
+
+		/** On teste si les pseudo, nom et prenom ont le bon format. */
+		if (!pseudo.matches("[0-9A-Za-z]{4,}")) throw new JoueurException("Un pseudo doit contenir au moins 4 caracteres et ils doivent etre alphanumeriques");
+		if (!nom.matches("[0-9A-Za-z]{1,}")) throw new JoueurException("Le nom doit contenir au moins 1 caractere et doit etre alphanumeriques");
+		if (!prenom.matches("[0-9A-Za-z]{1,}")) throw new JoueurException("Le prenom doit contenir au moins 1 caractere et doit etre alphanumeriques");
+
+		/** On teste si le joueur existe bien dans la liste des joueurs. */
+		int testSupp = 0;
+		if (listeJoueurs.size() != 0) {
+			for (Joueur joueur : listeJoueurs) {
+				if (joueur.getNom().equals(nom) && joueur.getPrenom().equals(prenom) && joueur.getPseudo().equals(pseudo)) {
+					/** Si le joueur a des paris en cours on ne le supprime pas. */
+					if (joueur.getListeParis().size() != 0) throw new JoueurException("Le joueur a supprime a des paris en cours."); 
+   				else {
+   					testSupp = 1;
+   					listeJoueurs.remove(joueur);
+   					return 0;
+   				}
+				} 
+			}
+		}
+    if (testSupp == 0) throw new JoueurInexistantException("Le joueur a supprimer n'existe pas !");
+    return 0;
 	}
 
 
@@ -153,6 +218,65 @@ public class SiteDeParisMetier {
 	 * n'est pas instanciée ou est dépassée.
 	 */
 	public void ajouterCompetition(String competition, DateFrancaise dateCloture, String [] competiteurs, String passwordGestionnaire) throws MetierException, CompetitionExistanteException, CompetitionException  {
+
+		/** On teste si les arguments en parametres ne sont pas null. */
+		if (competition == null) throw new CompetitionException ("Le nom de la competition doit etre instancie");
+		if (dateCloture == null) throw new CompetitionException("La date de cloture doit etre instancie !");
+		if (competiteurs == null) throw new MetierException("Les competiteurs doivent etre instancie !");
+		if (passwordGestionnaire == null) throw new MetierException("Veuillez entrer le mot de passe du gestionnaire");
+
+		/** On teste si c'est bien le mot de passe du gestionnaire.  */
+		this.validitePasswordGestionnaire(passwordGestionnaire);
+		
+		/** On teste si la date de cloture n'est pas deja depassee. */
+		if (dateCloture.estDansLePasse()) throw new CompetitionException("La date de cloture est deja passe !");
+      
+      /** On teste si les noms des competiteurs sont valides. */
+      for (String comp : competiteurs) {
+			if (comp == null) throw new CompetitionException("Un nom de competiteur doit etre instancie !");
+      }
+      
+		/** On teste si le nom de la competition et le nom des competiteurs sont valides. */
+		if (!competition.matches("[0-9A-Za-z]{4,}")) throw new CompetitionException("Un nom de competition doit contenir au moins 4 caracteres et ils doivent etre alphanumeriques");
+		for (String comp : competiteurs) {
+			if (!comp.matches("[0-9A-Za-z]{4,}")) throw new CompetitionException("Un nom de competiteur doit contenir au moins 4 caracteres et ils doivent etre alphanumeriques");
+		}
+      
+      /** Si le nombre des competiteurs est de 1, on signale une exception.*/
+      if (competiteurs.length < 2) throw new CompetitionException("Il n'y a pas assez de competiteurs.");
+      
+      /** On teste si deux competiteurs n'ont pas le meme nom dans la liste. */
+      Map<String, Integer> hm = new HashMap<String, Integer>(); 
+		for (String i : competiteurs) { 
+	            Integer j = hm.get(i); 
+	            hm.put(i, (j == null) ? 1 : j + 1); 
+	    } 
+	  
+	        // displaying the occurrence of elements in the arraylist https://www.geeksforgeeks.org/count-occurrences-elements-list-java/
+	    for (Map.Entry<String, Integer> val : hm.entrySet()) { 
+	        	if(val.getValue()==2)throw new CompetitionException();
+	    }
+		/** On recherche si la competition n'existe pas deja.
+		 * Si oui, on signale une exception.
+		 * Si non, on peut ajouter la competition.
+		 */
+		int testAjout = 0;
+		if (listeCompetitions.size() != 0) {
+			for (Competition comp : listeCompetitions) {
+				if (comp.getNom().equals(competition)) {
+               testAjout = 1;
+					throw new CompetitionExistanteException("La competition existe deja !");
+				}
+			}
+		}
+		if (testAjout == 0) {
+         LinkedList<Competiteur> competiteurslst = new LinkedList<Competiteur>();
+         for (String comp : competiteurs) {
+            competiteurslst.add(new Competiteur(comp));
+         }
+			Competition a = new Competition(competition,dateCloture,competiteurslst);
+			listeCompetitions.add(a);
+		};
 
 	}
 
@@ -213,6 +337,36 @@ public class SiteDeParisMetier {
 	 */
 	public void crediterJoueur(String nom, String prenom, String pseudo, long sommeEnJetons, String passwordGestionnaire) throws MetierException, JoueurException, JoueurInexistantException {
 
+		/** On teste si les arguments en parametres ne sont pas null. */
+		if (pseudo == null) throw new JoueurException ("Le pseudo doit etre instancie");
+		if (nom == null) throw new JoueurException("Le nom doit etre instancie !");
+		if (prenom == null) throw new JoueurException("Le prenom doit etre instancie !");
+		if (passwordGestionnaire == null) throw new MetierException("Veuillez entrer le mot de passe du gestionnaire.");
+
+		/** On teste si c'est bien le mot de passe du gestionnaire.  */
+		this.validitePasswordGestionnaire(passwordGestionnaire);
+
+		/** On teste si la somme a rentrer n'est pas negative */
+		if (sommeEnJetons < 0) throw new MetierException("Une somme a crediter doit etre superieure a 0 !");
+
+
+		/** On teste si les pseudo, nom et prenom ont le bon format. */
+		if (!pseudo.matches("[0-9A-Za-z]{4,}")) throw new JoueurException("Un pseudo doit contenir au moins 4 caracteres et ils doivent etre alphanumeriques");
+		if (!nom.matches("[0-9A-Za-z]{1,}")) throw new JoueurException("Le nom doit contenir au moins 1 caractere et doit etre alphanumeriques");
+		if (!prenom.matches("[0-9A-Za-z]{1,}")) throw new JoueurException("Le prenom doit contenir au moins 1 caractere et doit etre alphanumeriques");
+
+		/** On recherche le joueur a crediter et on le credite. S'il n'existe pas on lance une exception.*/
+		int testCred = 0;
+		if (listeJoueurs.size() != 0) {
+			for (Joueur joueur : listeJoueurs) {
+				if (joueur.getNom().equals(nom) && joueur.getPrenom().equals(prenom) && joueur.getPseudo().equals(pseudo)) {
+					joueur.setCompte(joueur.getCompte() + sommeEnJetons);
+					testCred = 1; 
+				} 
+			}
+		}
+    if (testCred == 0) throw new JoueurInexistantException("Le joueur a crediter n'existe pas !");
+
 	}
 
 
@@ -237,7 +391,36 @@ public class SiteDeParisMetier {
 	 */
 
 	public void debiterJoueur(String nom, String prenom, String pseudo, long sommeEnJetons, String passwordGestionnaire) throws  MetierException, JoueurInexistantException, JoueurException {
+		/** On teste si les arguments en parametres ne sont pas null. */
+		if (pseudo == null) throw new JoueurException ("Le pseudo doit etre instancie");
+		if (nom == null) throw new JoueurException("Le nom doit etre instancie !");
+		if (prenom == null) throw new JoueurException("Le prenom doit etre instancie !");
+		if (passwordGestionnaire == null) throw new MetierException("Veuillez entrer le mot de passe du gestionnaire.");
 
+		/** On teste si c'est bien le mot de passe du gestionnaire.  */
+		this.validitePasswordGestionnaire(passwordGestionnaire);
+
+		/** On teste si la somme a rentrer n'est pas negative */
+		if (sommeEnJetons < 0) throw new MetierException("Une somme a crediter doit etre superieure a 0 !");
+
+
+		/** On teste si les pseudo, nom et prenom ont le bon format. */
+		if (!pseudo.matches("[0-9A-Za-z]{4,}")) throw new JoueurException("Un pseudo doit contenir au moins 4 caracteres et ils doivent etre alphanumeriques");
+		if (!nom.matches("[0-9A-Za-z]{1,}")) throw new JoueurException("Le nom doit contenir au moins 1 caractere et doit etre alphanumeriques");
+		if (!prenom.matches("[0-9A-Za-z]{1,}")) throw new JoueurException("Le prenom doit contenir au moins 1 caractere et doit etre alphanumeriques");
+
+		/** On recherche le joueur a dediter et on le credite. S'il n'existe pas on lance une exception.*/
+		int testCred = 0;
+		if (listeJoueurs.size() != 0) {
+			for (Joueur joueur : listeJoueurs) {
+				if (joueur.getNom().equals(nom) && joueur.getPrenom().equals(prenom) && joueur.getPseudo().equals(pseudo)) {
+					if (sommeEnJetons >= joueur.getCompte()) throw new JoueurException("Le joueur n'a pas assez de jetons sur son compte !");
+					joueur.setCompte(joueur.getCompte() + sommeEnJetons);
+					testCred = 1; 
+				} 
+			}
+		}
+		if (testCred == 0) throw new JoueurInexistantException("Le joueur a dediter n'existe pas !");
 	}
 
 
@@ -261,7 +444,26 @@ public class SiteDeParisMetier {
 	 *  </ul>
 	 */
 	public LinkedList <LinkedList <String>> consulterJoueurs(String passwordGestionnaire) throws MetierException {
-		return new LinkedList <LinkedList <String>>();
+
+		/** On teste si c'est bien le mot de passe du gestionnaire.  */
+		this.validitePasswordGestionnaire(passwordGestionnaire);
+		
+		/** On cree la liste. */
+		LinkedList< LinkedList<String>> consult = new LinkedList< LinkedList<String>>();
+		for (Joueur joueur : listeJoueurs) {
+			LinkedList<String> description = new LinkedList<String>();
+			description.add(joueur.getNom());
+			description.add(joueur.getPrenom());
+			description.add(joueur.getPseudo());
+			description.add(String.valueOf(joueur.getCompte()));
+         int somme = 0;
+			for (Pari pari : joueur.getListeParis()) {
+				somme += pari.getMontant();
+			}
+			description.add(String.valueOf(somme));
+		   consult.add(description);
+		}
+		return consult;
 	}
 
 
@@ -299,6 +501,74 @@ public class SiteDeParisMetier {
 	 */
     public void miserVainqueur(String pseudo, String passwordJoueur, long miseEnJetons, String competition, String vainqueurEnvisage) throws MetierException, JoueurInexistantException, CompetitionInexistanteException, CompetitionException, JoueurException  {
 
+			/** On teste si la mise est positive. */
+			if (miseEnJetons < 0) throw new MetierException("La mise doit etre positive !");
+
+			/** On teste si les valeurs des parametres a rentrer ne sont pas null. */
+			if (pseudo == null) throw new JoueurException ("Le pseudo doit etre instancie !");
+			if (passwordJoueur == null) throw new JoueurException ("Le mot de passe doit etre instancie !");
+			if (competition == null) throw new CompetitionException ("Le nom de competition doit etre instancie !");
+			if (vainqueurEnvisage == null) throw new CompetitionException ("Le nom de competiteur doit etre instancie !");
+
+			/** On teste si les pseudo, le mot de passe, le nom de la competition et le nom du competiteur ont le bon format. */
+			if (!pseudo.matches("[0-9A-Za-z]{4,}")) throw new JoueurException("Un pseudo doit contenir au moins 4 caracteres et ils doivent etre alphanumeriques");
+			if (!passwordJoueur.matches("[0-9A-Za-z]{8,}")) throw new JoueurException("Le mot de passe doit contenir au moins 8 caractere et doit etre alphanumeriques");
+			if (!vainqueurEnvisage.matches("[0-9A-Za-z]{4,}")) throw new CompetitionException("Le nom du competiteur doit contenir au moins 8 caractere et doit etre alphanumeriques");
+			if (!competition.matches("[0-9A-Za-z]{4,}")) throw new CompetitionException("Le nom d'une competition doit contenir au moins 8 caractere et doit etre alphanumeriques");
+
+			/** On cherche le joueur et la competition concerne */
+			Joueur parieur = new Joueur();
+			Competition competitionPari = new Competition();
+			Competiteur competiteurPari = new Competiteur();
+			Pari pariVainq = new Pari();
+
+			/** -- Recherche de la competition -- */
+			int testComp = 0;
+			if (listeCompetitions.size() > 0) {
+				for (Competition comp : listeCompetitions) {
+					if (comp.getNom().equals(competition)) {
+						/** On teste si la date de cloture est passe. */
+						if (comp.getDateCloture().estDansLePasse()) throw new CompetitionException("La date de cloture est passe.");
+
+						/** On cherche le nom du competiteur */
+						int testCompet = 0;
+						if (comp.getCompetiteurs().size() > 0) {
+							for (Competiteur compet : comp.getCompetiteurs()) {
+								if (compet.getNom().equals(vainqueurEnvisage)) {
+									testComp = 1;
+									testCompet = 1;
+									competitionPari = comp;
+									competiteurPari = compet;
+								}
+							}
+						} if (testCompet == 0) throw new CompetitionException("Le competiteur a parie ne participe pas a la competition !");
+					}
+				} 
+			} if (testComp == 0) throw new CompetitionInexistanteException("La competition a parier n'existe pas !");
+
+			/** -- Recherche du joueur -- */
+			int testJoueur = 0;
+			if (listeJoueurs.size() > 0) {
+				for (Joueur joueur : listeJoueurs) {
+					if (joueur.getPseudo().equals(pseudo)) {
+
+						/** On verifie si le password concorde. */
+						if (joueur.getPasswordJoueur().equals(passwordJoueur)) {
+							
+							/** On verifie si le joueur a assez d'argent sur son compte. */
+							if (joueur.getCompte() > miseEnJetons) {
+								testJoueur = 1;
+								joueur.setCompte(joueur.getCompte() - miseEnJetons);
+								parieur = joueur;
+								pariVainq.setParieur(parieur);
+								pariVainq.setVainqueurEspere(competiteurPari);
+								pariVainq.setCompetition(competitionPari);
+								joueur.addPari(pariVainq);
+							} else throw new JoueurException("Le joueur n'a pas assez de jetons sur son compte !");
+						} else throw new JoueurException("Le mot de passe ne correspond pas !");
+					}
+				}
+			} if (testJoueur == 0) throw new JoueurInexistantException("Le joueur a recherche n'existe pas !"); 
 	}
 
 
@@ -317,7 +587,17 @@ public class SiteDeParisMetier {
 	 *  </ul>
 	 */
 	public LinkedList <LinkedList <String>> consulterCompetitions(){
-		return new LinkedList <LinkedList <String>>();
+
+
+		/** On cree la liste. */
+		LinkedList< LinkedList<String>> consult = new LinkedList< LinkedList<String>>();
+		for (Competition comp : listeCompetitions) {
+			LinkedList<String> description = new LinkedList<String>();
+			description.add(comp.getNom());
+			description.add(comp.getDateCloture().toString());
+			consult.add(description);
+      }
+		return consult;
 	} 
 
 	/**
@@ -332,7 +612,29 @@ public class SiteDeParisMetier {
 	 * @return la liste des compétiteurs de la  compétition.
 	 */
 	public LinkedList <String> consulterCompetiteurs(String competition) throws CompetitionException, CompetitionInexistanteException{
-		return new LinkedList <String> ();
+
+		/** On teste si le nom de la competition n'est pas null. */
+		if (competition == null) throw new CompetitionException ("Le nom de la competition doit etre instancie");
+		
+		/** On teste la taille du nom de la competition. */
+		if (!competition.matches("[0-9A-Za-z]{4,}")) throw new CompetitionException("Une competition doit contenir au moins 4 caracteres et ils doivent etre alphanumeriques");
+		/** On teste si la competition existe */
+      LinkedList<String> competiteurs = new LinkedList<String>();
+		int testExist = 0;
+		if (listeCompetitions.size() != 0) {
+			for (Competition comp : listeCompetitions) {
+				if (comp.getNom().equals(competition)) {
+							testExist = 1;
+                     LinkedList<Competiteur> compet = comp.getCompetiteurs();
+							for (Competiteur compett : compet){
+							   competiteurs.add(compett.getNom());
+							}
+                     return competiteurs;
+						}
+				} 
+			}
+		if (testExist == 0) throw new CompetitionInexistanteException("La competition n'existe pas !");
+      return competiteurs;
 	}
 
 	/**
@@ -344,42 +646,13 @@ public class SiteDeParisMetier {
 	 * si le <code>passwordGestionnaire</code> est invalide.  
 	 */
 	protected void validitePasswordGestionnaire(String passwordGestionnaire) throws MetierException {
-	    if (passwordGestionnaire==null) throw new MetierException();
-	    if (!passwordGestionnaire.matches("[0-9A-Za-z]{8,}")) throw new MetierException();
-       else {
-         if (!(this.passwordGestionnaire == passwordGestionnaire))
-            throw new MetierException("Password invalide");
-       };
+	  if (passwordGestionnaire == null) throw new MetierException();
+		if (!passwordGestionnaire.matches("[0-9A-Za-z]{8,}")) throw new MetierException();
+    if (passwordGestionnaire.length()!=0) {
+			if (!(this.passwordGestionnaire.equals(passwordGestionnaire))) throw new MetierException("Erreur Mot de passe Admin");
+      };
 	}
 
-	/** 
-	 * @uml.property name="joueurs"
-	 * @uml.associationEnd multiplicity="(0 -1)" inverse="siteDeParisMetier:siteParis.Joueur"
-	 * @uml.association name="listeJoueurs"
-	 */
-	private Collection joueur = new java.util.ArrayList();
-
-	/** 
-	 * Getter of the property <tt>joueurs</tt>
-	 * @return  Returns the joueur.
-	 * @uml.property  name="joueurs"
-	 */
-	public Collection getJoueurs() {
-		return joueur;
-	}
-
-
-
-
-
-	/** 
-	 * Setter of the property <tt>joueurs</tt>
-	 * @param joueurs  The joueur to set.
-	 * @uml.property  name="joueurs"
-	 */
-	public void setJoueurs(Collection joueurs) {
-		joueur = joueurs;
-	}
 
 	/**
 	 * @uml.property  name="passwordGestionnaire"
@@ -414,27 +687,6 @@ public class SiteDeParisMetier {
 	 */
 	private Collection competition;
 
-	/**
-	 * Getter of the property <tt>competition</tt>
-	 * @return  Returns the competition.
-	 * @uml.property  name="competition"
-	 */
-	public Collection getCompetition() {
-		return competition;
-	}
-
-
-
-
-
-	/**
-	 * Setter of the property <tt>competition</tt>
-	 * @param competition  The competition to set.
-	 * @uml.property  name="competition"
-	 */
-	public void setCompetition(Collection competition) {
-		this.competition = competition;
-	}
 
 
 
