@@ -637,6 +637,8 @@ public class TestMetier {
 			DateFrancaise.setDate(7, 6, 2012, 18, 30);
 			siteDeParisMetier.solderVainqueur(new String("finaleRG2012"),new String("Tsonga"), new String("ilesCaimans"));
 
+			System.out.println(siteDeParisMetier.consulterJoueurs("ilesCaimans"));
+			System.out.println(siteDeParisMetier.consulterCompetitions("ilesCaimans"))
 			// solder une competition déja soldée
 			try {
 				siteDeParisMetier.solderVainqueur(new String("ChampionnatDeFrance2012"),"Nancy", new String("ilesCaimans"));
@@ -955,6 +957,7 @@ public class TestMetier {
 
 
 			LinkedList <String> competiteurs = siteDeParisMetier.consulterCompetiteurs(new String("ChampionnatDeFrance2012"));
+			System.out.println(competiteurs);
 			if (competiteurs.size()!= 10)
 				System.out.println("consulterCompetiteurs ne rend pas une liste de deux compétiteurs pour le  ChampionnatDeFrance2012");
 			if (!competiteurs.contains(new String("Lyon")))
@@ -964,8 +967,9 @@ public class TestMetier {
 			if (!competiteurs.contains("Auxerre"))
 				System.out.println("consulterCompetiteurs ne rend pas pour le ChampionnatDeFrance2012 le compétiteur Auxerre");
 
-
+			
 			competiteurs = siteDeParisMetier.consulterCompetiteurs(new String("finaleRG2012"));
+			System.out.println(competiteurs);
 			if (competiteurs.size()!= 2)
 				System.out.println("consulterCompetiteurs ne rend pas une liste de deux compétiteurs pour la  finaleRG2012");
 			if (!competiteurs.contains(new String("Nadal")))
@@ -1072,7 +1076,7 @@ public class TestMetier {
 			siteDeParisMetier.miserVainqueur(new String("fanfan"), passwdFrancoise, 20, new String("ChampionnatDeFrance2012"), new String("Brest"));
 			siteDeParisMetier.miserVainqueur(new String("zinzin"), passwdSylvain, 40, new String("ChampionnatDeFrance2012"), new String("Lille"));
 			siteDeParisMetier.miserVainqueur(new String("aure"), passwdAureliane, 37, new String("ChampionnatDeFrance2012"), new String("Marseille"));
-
+			
 			siteDeParisMetier.miserVainqueur(new String("nanard"), passwdBernard, 80, new String("ChampionnatDeFrance2013"), new String("Nantes"));
 			siteDeParisMetier.miserVainqueur(new String("fanfan"), passwdFrancoise, 30, new String("ChampionnatDeFrance2013"), new String("Rennes"));
 			siteDeParisMetier.miserVainqueur(new String("aure"), passwdAureliane, 48, new String("ChampionnatDeFrance2013"), new String("Nantes"));
@@ -1134,13 +1138,13 @@ public class TestMetier {
 		testConstructeurSiteDeParisMetier();
       	testValiditePasswordGestionnaire();
       	testInscrireDesinscrireJoueur();
-   	testCrediterDebiterJoueur();
+   		testCrediterDebiterJoueur();
 		testAjouterCompetition();
-//		testMiserVainqueur();
-//		testSolderVainqueur();
-//		testConsulterCompetitions();
-//    testConsulterCompetiteurs();
-      //testConsulterJoueurs();		
+    	testMiserVainqueur();
+    	testSolderVainqueur();
+    	testConsulterCompetitions();
+    	testConsulterCompetiteurs();
+    	testConsulterJoueurs();		
 
 	}
 

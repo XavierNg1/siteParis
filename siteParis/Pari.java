@@ -8,7 +8,7 @@ public class Pari {
 	/**
 	 * @uml.property  name="type"
 	 */
-	private int montant;
+	private long montant;
 	private Joueur parieur;
 	private Competiteur vainqueurEspere;
 	private Competition competition;
@@ -18,11 +18,11 @@ public class Pari {
 	 * @return  Returns the montant.
 	 * @uml.property  name="montant"
 	 */
-	public int getMontant() {
+	public long getMontant() {
 		return montant;
 	}
 
-	public void setMontant(int montant) {
+	public void setMontant(long montant) {
 		this.montant = montant;
 	}
 

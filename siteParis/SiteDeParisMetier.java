@@ -264,7 +264,7 @@ public class SiteDeParisMetier {
 		if (listeCompetitions.size() != 0) {
 			for (Competition comp : listeCompetitions) {
 				if (comp.getNom().equals(competition)) {
-               testAjout = 1;
+          testAjout = 1;
 					throw new CompetitionExistanteException("La competition existe deja !");
 				}
 			}
@@ -314,6 +314,83 @@ public class SiteDeParisMetier {
 	 */	
 	public void solderVainqueur(String competition, String vainqueur, String passwordGestionnaire) throws MetierException,  CompetitionInexistanteException, CompetitionException  {
 
+		/** On teste si c'est bien le mot de passe du gestionnaire.  */
+		this.validitePasswordGestionnaire(passwordGestionnaire);
+
+		/** On teste si les mot de passe, vainqueur et la competition ont le bon format. */
+		if (!passwordGestionnaire.matches("[0-9A-Za-z]{8,}")) throw new MetierException("Le mot de passe doit contenir au moins 8 caracteres et ils doivent etre alphanumeriques");
+		if (!vainqueur.matches("[0-9A-Za-z]{1,}")) throw new CompetitionException("Le nom doit contenir au moins 1 caractere et doit etre alphanumeriques");
+		if (!competition.matches("[0-9A-Za-z]{1,}")) throw new CompetitionException("Le prenom doit contenir au moins 1 caractere et doit etre alphanumeriques");
+
+		/** On recherche la competition. */
+		int index = 0;
+		Competition compSolde = new Competition();
+		if (listeCompetitions.size() > 0) {
+			int testComp = 0;
+			for (int i = 0; i < listeCompetitions.size(); i++) {
+				if (listeCompetitions.get(i).getNom().equals(competition)){
+					/** On verifie la date de cloture. */
+					if (!listeCompetitions.get(i).getDateCloture().estDansLePasse()) throw new CompetitionException("La date de cloture n'est pas encore arrive !");
+					/** On recherche le competiteur. */
+					testComp = 1;
+					if (listeCompetitions.get(i).getCompetiteurs().size() > 0) {
+						int testCompet = 0;
+						for (Competiteur compet : listeCompetitions.get(i).getCompetiteurs()) {
+							if (compet.getNom().equals(vainqueur)) {
+								index = i;
+
+								/** On cree la cagnotte de la competition. */
+								long cagnotte = 0;
+                        long cagnotteVainq = 0;
+								for (Pari pariComp : listeCompetitions.get(i).getParis()) {
+									cagnotte += pariComp.getMontant();
+                  if (pariComp.getVainqueurEspere().equals(vainqueur)) cagnotteVainq += pariComp.getMontant();
+								}
+                        
+								testCompet = 1;
+								/** On recherche les joueurs ayant parie sur cette competition et sur le vainqueur. */
+								int testGagnant = 0;
+								if (listeJoueurs.size() > 0) {
+										for (Joueur joueur : listeJoueurs) {
+											/** On parcourt leur pari. */
+											if (joueur.getListeParis().size() > 0) {
+												for (Pari pari : joueur.getListeParis()) {
+													if (pari.getCompetition().getNom().equals(competition)) {
+														if (pari.getVainqueurEspere().equals(vainqueur)) {
+															testGagnant = 1;
+															long sommeGagnee = ( pari.getMontant() * cagnotte ) / cagnotteVainq;
+															//cagnotte -= sommeGagnee;
+															System.out.println(cagnotte);
+															joueur.setCompte(joueur.getCompte() + sommeGagnee);
+														}
+													}
+												}
+											}
+										} 
+									/** Dans le cas ou personne n'a parie sur le vainqueur */
+									if (testGagnant == 0) {
+										if (listeJoueurs.size() > 0) {
+												for (Joueur joueur : listeJoueurs) {
+													/** On parcourt leur pari. */
+													if (joueur.getListeParis().size() > 0) {
+														for (Pari pari : joueur.getListeParis()) {
+															if (pari.getCompetition().getNom().equals(competition)) {
+																	//cagnotte -= pari.getMontant();
+																	joueur.setCompte(joueur.getCompte() + pari.getMontant());
+																}
+															}
+														}
+													}
+											} 
+									}
+								}
+							}
+						} if (testCompet == 0) throw new CompetitionException("Le nom du vainqueur n'existe pas dans la competition demande !");
+					}
+				}
+			} if (testComp == 0) throw new CompetitionInexistanteException("La competition a solder n'existe pas !");
+			else this.listeCompetitions.remove(listeCompetitions.get(index));
+		}
 	}
 
 
@@ -414,8 +491,8 @@ public class SiteDeParisMetier {
 		if (listeJoueurs.size() != 0) {
 			for (Joueur joueur : listeJoueurs) {
 				if (joueur.getNom().equals(nom) && joueur.getPrenom().equals(prenom) && joueur.getPseudo().equals(pseudo)) {
-					if (sommeEnJetons >= joueur.getCompte()) throw new JoueurException("Le joueur n'a pas assez de jetons sur son compte !");
-					joueur.setCompte(joueur.getCompte() + sommeEnJetons);
+					if (sommeEnJetons > joueur.getCompte()) throw new JoueurException("Le joueur n'a pas assez de jetons sur son compte !");
+					else joueur.setCompte(joueur.getCompte() - sommeEnJetons);
 					testCred = 1; 
 				} 
 			}
@@ -456,7 +533,7 @@ public class SiteDeParisMetier {
 			description.add(joueur.getPrenom());
 			description.add(joueur.getPseudo());
 			description.add(String.valueOf(joueur.getCompte()));
-         int somme = 0;
+      int somme = 0;
 			for (Pari pari : joueur.getListeParis()) {
 				somme += pari.getMontant();
 			}
@@ -558,12 +635,14 @@ public class SiteDeParisMetier {
 							/** On verifie si le joueur a assez d'argent sur son compte. */
 							if (joueur.getCompte() > miseEnJetons) {
 								testJoueur = 1;
-								joueur.setCompte(joueur.getCompte() - miseEnJetons);
+								this.debiterJoueur(joueur.getNom(), joueur.getPrenom(), joueur.getPseudo(), miseEnJetons, passwordGestionnaire);
 								parieur = joueur;
 								pariVainq.setParieur(parieur);
 								pariVainq.setVainqueurEspere(competiteurPari);
 								pariVainq.setCompetition(competitionPari);
+								pariVainq.setMontant(miseEnJetons);
 								joueur.addPari(pariVainq);
+								competitionPari.addPari(pariVainq);
 							} else throw new JoueurException("Le joueur n'a pas assez de jetons sur son compte !");
 						} else throw new JoueurException("Le mot de passe ne correspond pas !");
 					}
@@ -619,22 +698,20 @@ public class SiteDeParisMetier {
 		/** On teste la taille du nom de la competition. */
 		if (!competition.matches("[0-9A-Za-z]{4,}")) throw new CompetitionException("Une competition doit contenir au moins 4 caracteres et ils doivent etre alphanumeriques");
 		/** On teste si la competition existe */
-      LinkedList<String> competiteurs = new LinkedList<String>();
+    LinkedList<String> competiteurs = new LinkedList<String>();
 		int testExist = 0;
 		if (listeCompetitions.size() != 0) {
 			for (Competition comp : listeCompetitions) {
 				if (comp.getNom().equals(competition)) {
 							testExist = 1;
-                     LinkedList<Competiteur> compet = comp.getCompetiteurs();
-							for (Competiteur compett : compet){
-							   competiteurs.add(compett.getNom());
+							for (Competiteur compett : comp.getCompetiteurs()){
+							  competiteurs.add(compett.getNom());
 							}
-                     return competiteurs;
 						}
 				} 
 			}
 		if (testExist == 0) throw new CompetitionInexistanteException("La competition n'existe pas !");
-      return competiteurs;
+    return competiteurs;
 	}
 
 	/**

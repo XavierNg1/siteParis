@@ -32,7 +32,7 @@ public class Competiteur {
 		/**
 		 */
 		public Competiteur(String nom){
-			
+			this.nom = nom;
 		}
 
 			
