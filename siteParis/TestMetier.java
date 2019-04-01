@@ -633,12 +633,13 @@ public class TestMetier {
 			// solder correctement un vainqueur
 
 			DateFrancaise.setDate(4, 6, 2012, 18, 10);
+         System.out.println(siteDeParisMetier.consulterCompetitions());
 			siteDeParisMetier.solderVainqueur(new String("ChampionnatDeFrance2012"),"Nancy", new String("ilesCaimans"));
 			DateFrancaise.setDate(7, 6, 2012, 18, 30);
 			siteDeParisMetier.solderVainqueur(new String("finaleRG2012"),new String("Tsonga"), new String("ilesCaimans"));
 
 			System.out.println(siteDeParisMetier.consulterJoueurs("ilesCaimans"));
-			System.out.println(siteDeParisMetier.consulterCompetitions("ilesCaimans"))
+			System.out.println(siteDeParisMetier.consulterCompetitions());
 			// solder une competition déja soldée
 			try {
 				siteDeParisMetier.solderVainqueur(new String("ChampionnatDeFrance2012"),"Nancy", new String("ilesCaimans"));
@@ -767,7 +768,7 @@ public class TestMetier {
 			// on vérifie trois crédits restants 
 
 			//  nanard doit avoir une crédit de 1868
-
+			System.out.println(siteDeParisMetier.consulterJoueurs(new String("ilesCaimans")));
 			try {
 				siteDeParisMetier.debiterJoueur(new String("Prou"), new String("Bernard"), new String("nanard"), 1869, new String("ilesCaimans"));
 				System.out.println("le credit de bernard devrait être inférieur à 1869, et l'exception JoueurException aurait dû être levée");
@@ -1098,6 +1099,7 @@ public class TestMetier {
 			siteDeParisMetier.solderVainqueur(new String("ChampionnatDeFrance2012"),new String("Marseille"), new String("ilesCaimans"));
 
 			joueurs = siteDeParisMetier.consulterJoueurs(new String("ilesCaimans"));
+         System.out.println(siteDeParisMetier.consulterJoueurs(new String("ilesCaimans")));
 			for (LinkedList <String> l : joueurs) {
 				if (l.get(2).equals(new String("momo")) && (!l.get(0).equals(new String("Prou")) || !l.get(1).equals(new String("Morgane")) || !l.get(3).equals("" + 1848) || !l.get(4).equals("" + 0)))
 					System.out.println("probleme sur affichage du joueur momo après premier solder");				

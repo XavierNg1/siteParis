@@ -312,107 +312,217 @@ public class SiteDeParisMetier {
 	 * si la date de clôture de la compétition est dans le futur.
 	 * 
 	 */	
-	public void solderVainqueur(String competition, String vainqueur, String passwordGestionnaire) throws MetierException,  CompetitionInexistanteException, CompetitionException  {
+	public void solderVainqueur(String competition, String vainqueur, String passwordGestionnaire) throws MetierException,  CompetitionInexistanteException, CompetitionException, JoueurException, JoueurInexistantException  {
 
-		/** On teste si c'est bien le mot de passe du gestionnaire.  */
 		this.validitePasswordGestionnaire(passwordGestionnaire);
-
-		/** On teste si les mot de passe, vainqueur et la competition ont le bon format. */
-		if (!passwordGestionnaire.matches("[0-9A-Za-z]{8,}")) throw new MetierException("Le mot de passe doit contenir au moins 8 caracteres et ils doivent etre alphanumeriques");
-		if (!vainqueur.matches("[0-9A-Za-z]{1,}")) throw new CompetitionException("Le nom doit contenir au moins 1 caractere et doit etre alphanumeriques");
-		if (!competition.matches("[0-9A-Za-z]{1,}")) throw new CompetitionException("Le prenom doit contenir au moins 1 caractere et doit etre alphanumeriques");
-
-		/** On recherche la competition. */
-		int index = 0;
-		Competition compSolde = new Competition();
-		if (listeCompetitions.size() > 0) {
-			int testComp = 0;
-			for (int i = 0; i < listeCompetitions.size(); i++) {
-				if (listeCompetitions.get(i).getNom().equals(competition)){
-					/** On verifie la date de cloture. */
-					if (!listeCompetitions.get(i).getDateCloture().estDansLePasse()) throw new CompetitionException("La date de cloture n'est pas encore arrive !");
-					/** On recherche le competiteur. */
-					testComp = 1;
-					if (listeCompetitions.get(i).getCompetiteurs().size() > 0) {
-						int testCompet = 0;
-						for (Competiteur compet : listeCompetitions.get(i).getCompetiteurs()) {
-							if (compet.getNom().equals(vainqueur)) {
-								index = i;
-
-								/** On cree la cagnotte de la competition. */
-								long cagnotte = 0;
-                        long cagnotteVainq = 0;
-								for (Pari pariComp : listeCompetitions.get(i).getParis()) {
-									cagnotte += pariComp.getMontant();
-                  if (pariComp.getVainqueurEspere().equals(vainqueur)) cagnotteVainq += pariComp.getMontant();
-								}
-                        
-								testCompet = 1;
-								/** On recherche les joueurs ayant parie sur cette competition et sur le vainqueur. */
-								int testGagnant = 0;
-								if (listeJoueurs.size() > 0) {
-										for (Joueur joueur : listeJoueurs) {
-											/** On parcourt leur pari. */
-											if (joueur.getListeParis().size() > 0) {
-												for (Pari pari : joueur.getListeParis()) {
-													if (pari.getCompetition().getNom().equals(competition)) {
-														if (pari.getVainqueurEspere().equals(vainqueur)) {
-															testGagnant = 1;
-															long sommeGagnee = ( pari.getMontant() * cagnotte ) / cagnotteVainq;
-															//cagnotte -= sommeGagnee;
-															System.out.println(cagnotte);
-															joueur.setCompte(joueur.getCompte() + sommeGagnee);
-														}
-													}
-												}
-											}
-										} 
-									/** Dans le cas ou personne n'a parie sur le vainqueur */
-									if (testGagnant == 0) {
-										if (listeJoueurs.size() > 0) {
-												for (Joueur joueur : listeJoueurs) {
-													/** On parcourt leur pari. */
-													if (joueur.getListeParis().size() > 0) {
-														for (Pari pari : joueur.getListeParis()) {
-															if (pari.getCompetition().getNom().equals(competition)) {
-																	//cagnotte -= pari.getMontant();
-																	joueur.setCompte(joueur.getCompte() + pari.getMontant());
-																}
-															}
-														}
-													}
-											} 
-									}
-								}
-							}
-						} if (testCompet == 0) throw new CompetitionException("Le nom du vainqueur n'existe pas dans la competition demande !");
-					}
+		
+		int testexist=0; 
+		if (listeCompetitions.size()!=0) 
+		{
+			
+			for(int i = 0; i < listeCompetitions.size(); i++){
+				if(listeCompetitions.get(i).getNom().equals(competition)) {
+					if( !(listeCompetitions.get(i)).getDateCloture().estDansLePasse())throw new CompetitionException();
+					testexist=1; 
+										
 				}
-			} if (testComp == 0) throw new CompetitionInexistanteException("La competition a solder n'existe pas !");
-			else this.listeCompetitions.remove(listeCompetitions.get(index));
+			}
+								
+		}	
+		if (testexist==0) throw new CompetitionInexistanteException("La compete est passe");					
+	
+		
+		
+		
+		
+		////Script test pour faire fonctionner ConsulterCompetition sans problème 
+		//*******A terminer**********************
+		
+		int index=0;
+		int t=0;
+		if (listeCompetitions.size()!=0) 
+		{
+			
+			for(int i = 0; i < listeCompetitions.size(); i++){
+				if(listeCompetitions.get(i).getNom().equals(competition)) {
+					index=i;
+					//System.out.println(competitionsEnCours);
+					for(Competiteur n:listeCompetitions.get(i).getCompetiteurs()) {
+						//System.out.println(competitions.get(i).getCompetiteur());
+							if(n.getNom().equals(vainqueur)) {
+							t=1;
+							
+							}
+				    }
+					//System.out.println(competitionsEnCours);
+					if(t==0)throw new CompetitionException();
+					
+					//System.out.println(competitionsEnCours);
+					//testexiste=1; 
+					//competitionsEnCours.remove(i);
+					//competitions.remove(i);//allJoueurs.remove(i);
+					// System.out.println(joueurs.get(i).getCompte());
+					//System.out.println(competitionsEnCours);
+				}
+			}
+				
+		}		
+		//competitions.get(index);
+		
+		//competitions.get(index).getPari();
+		
+		long cagnote=0;
+		for(Pari p : listeCompetitions.get(index).getParis()) {
+					
+			 cagnote+=p.getMontant();
+		//	System.out.println(cagnote);
+			 
 		}
-	}
-
-
-
-	/**
-	 * créditer le compte en jetons d'un joueur du site de paris.
-	 * 
-	 * @param nom   le nom du joueur 
-	 * @param prenom   le prénom du joueur   
-	 * @param pseudo   le pseudo du joueur  
-	 * @param sommeEnJetons   la somme en jetons à créditer  
-	 * @param passwordGestionnaire  le password du gestionnaire du site  
-	 * 
-	 * @throws MetierException   levée 
-	 * si le <code>passwordGestionnaire</code>  est invalide,
-	 * si le <code>passwordGestionnaire</code> est incorrect,
-	 * si la somme en jetons est négative.
-	 * @throws JoueurException levée  
-	 * si <code>nom</code>, <code>prenom</code>,  <code>pseudo</code> sont invalides.
-	 * @throws JoueurInexistantException   levée si il n'y a pas de joueur  avec les mêmes nom,  prénom et pseudo.
-	 */
-	public void crediterJoueur(String nom, String prenom, String pseudo, long sommeEnJetons, String passwordGestionnaire) throws MetierException, JoueurException, JoueurInexistantException {
+		
+		long cagnoteVainq=0;
+		for(Pari p : listeCompetitions.get(index).getParis()) {
+		//	System.out.println(cagnote);
+				if(p.getVainqueurEspere().getNom().equals(vainqueur)) {
+					cagnoteVainq+=p.getMontant();
+				//	System.out.println(cagnoteVainq);
+					
+				}
+			 
+		}
+		
+		long mise=0;
+		long gain=0;
+		int indo=0;
+		//System.out.println(cagnoteVainq);
+		if (cagnoteVainq!=0) {			
+			
+			for(Pari p: listeCompetitions.get(index).getParis()) {
+				
+				if (p.getVainqueurEspere().getNom().equals(vainqueur)){
+					for(Joueur j:listeJoueurs){
+						if (j.getPseudo().equals(p.getParieur().getPseudo())) {
+							mise=p.getMontant();
+							gain=(mise*cagnote)/cagnoteVainq;
+							for(int i = 0; i < listeJoueurs.size(); i++){
+								if(listeJoueurs.get(i).getPseudo().equals(p.getParieur().getPseudo()))
+									indo=i;
+								//	System.out.println(q.getNom());
+									//System.out.println(p.getMonCreateur());
+								
+									
+									//System.out.println(q.getJetonsEngages());
+							}
+							
+						//	System.out.println(joueurs.get(indo).getJetonsEngages());
+                     System.out.println(consulterJoueurs(new String("ilesCaimans")));
+							listeJoueurs.get(indo).removePari(p);
+                     System.out.println(consulterJoueurs(new String("ilesCaimans")));
+						//	System.out.println(joueurs.get(indo).getJetonsEngages());
+							
+							this.crediterJoueur(j.getNom(), j.getPrenom(), j.getPseudo(), gain, this.passwordGestionnaire);
+						//	System.out.println(p.getMontant());
+							
+							
+							 
+						}
+					}
+					
+				}				
+					
+				if (!p.getVainqueurEspere().getNom().equals(vainqueur)){
+					for(Joueur j:listeJoueurs){//
+							if (j.getPseudo().equals(p.getParieur().getPseudo())) {
+								mise=p.getMontant();
+								gain=0;
+								//gain=(mise*cagnote)/cagnoteVainq;
+								for(int i = 0; i < listeJoueurs.size(); i++){
+									if(listeJoueurs.get(i).getPseudo().equals(p.getParieur().getPseudo()))
+										indo=i;
+									//	System.out.println(q.getNom());
+										//System.out.println(p.getMonCreateur());
+									
+										
+										//System.out.println(q.getJetonsEngages());
+								}
+								
+							//	System.out.println(joueurs.get(indo).getJetonsEngages());
+							//listeJoueurs.get(indo).setMiseEngage(listeJoueurs.get(indo).getCompte+mise);
+                     listeJoueurs.get(indo).removePari(p);
+							///	System.out.println(joueurs.get(indo).getJetonsEngages());
+								
+								this.crediterJoueur(j.getNom(), j.getPrenom(), j.getPseudo(), gain, this.passwordGestionnaire);
+							//	System.out.println(p.getMontant());
+								
+								
+								 
+							}
+						}
+					
+				
+								
+					
+				}
+				
+							
+				
+			}
+			
+			
+		}
+		
+		if (cagnoteVainq==0) {
+				
+				for(Pari p: listeCompetitions.get(index).getParis()) {
+					//System.out.println(p);				
+					for(Joueur j:listeJoueurs){//
+						if (j.getPseudo().equals(p.getParieur().getPseudo())) {
+							gain=p.getMontant();
+							
+							for(int i = 0; i < listeJoueurs.size(); i++){
+								if(listeJoueurs.get(i).getNom().equals(p.getParieur().getPseudo()))
+									indo=i;
+							//System.out.println(j.get(2));
+							//System.out.println(p.getMonCreateur());
+							//System.out.println(j.get(2));
+							//if (allJoueurs.get(j).get(2).equals(p.getMonCreateur())) {
+								//System.out.println(j.get(2));	
+								//gain=p.getMontant();
+								//System.out.println(gain);
+						
+							//this.crediterJoueur(j.get(0), j.get(1), j.get(2), gain, this.passwordGestionnaire);
+								//this.crediterJoueur(j.get(0), j.get(1), j.get(2), gain, this.passwordGestionnaire);
+							// System.out.println(allJoueurs);
+							 //joueurs.remove(i);
+							}
+							//System.out.println("*************************************");
+						///	System.out.println(joueurs.get(indo).getJetonsEngages());
+							listeJoueurs.get(indo).removePari(p);
+                     //listeJoueurs.get(indo).setMiseEngage(listeJoueurs.get(indo).getCompte+mise);
+							//System.out.println(joueurs.get(indo).getJetonsEngages());
+							this.crediterJoueur(j.getNom(), j.getPrenom(), j.getPseudo(), gain, this.passwordGestionnaire);
+						//	System.out.println("*************************************");
+							}
+						}
+						
+					}
+					
+					
+		}
+			
+		
+		
+				
+		//competitionsEnCours.remove(index);
+		listeCompetitions.remove(index);//allJoueurs.remove(i);
+		
+		
+		
+		
+					
+		
+		}
+   
+   public void crediterJoueur(String nom, String prenom, String pseudo, long sommeEnJetons, String passwordGestionnaire) throws MetierException, JoueurException, JoueurInexistantException {
 
 		/** On teste si les arguments en parametres ne sont pas null. */
 		if (pseudo == null) throw new JoueurException ("Le pseudo doit etre instancie");

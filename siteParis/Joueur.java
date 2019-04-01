@@ -163,4 +163,8 @@ public class Joueur {
 	public Joueur(){
 	}
 
+	public void removePari(Pari pari) {
+		this.listeParis.remove(pari);
+	}
+
 }
