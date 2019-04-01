@@ -522,6 +522,24 @@ public class SiteDeParisMetier {
 		
 		}
    
+    /**
+	 * créditer le compte en jetons d'un joueur du site de paris.
+	 * 
+	 * @param nom   le nom du joueur 
+	 * @param prenom   le prénom du joueur   
+	 * @param pseudo   le pseudo du joueur  
+	 * @param sommeEnJetons   la somme en jetons à créditer  
+	 * @param passwordGestionnaire  le password du gestionnaire du site  
+	 * 
+	 * @throws MetierException   levée 
+	 * si le <code>passwordGestionnaire</code>  est invalide,
+	 * si le <code>passwordGestionnaire</code> est incorrect,
+	 * si la somme en jetons est négative.
+	 * @throws JoueurException levée  
+	 * si <code>nom</code>, <code>prenom</code>,  <code>pseudo</code> sont invalides.
+	 * @throws JoueurInexistantException   levée si il n'y a pas de joueur  avec les mêmes nom,  prénom et pseudo.
+	 */
+   
    public void crediterJoueur(String nom, String prenom, String pseudo, long sommeEnJetons, String passwordGestionnaire) throws MetierException, JoueurException, JoueurInexistantException {
 
 		/** On teste si les arguments en parametres ne sont pas null. */
